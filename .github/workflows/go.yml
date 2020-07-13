@@ -1,15 +1,14 @@
-name: Go
-
 on:
   push:
     branches: [ master ]
   pull_request:
     branches: [ master ]
 
+name: Go
 jobs:
   test:
     name: Test
-     strategy:
+    strategy:
       matrix:
         go-version: [1.14.x]
         platform: [ubuntu-latest, macos-latest, windows-latest]
