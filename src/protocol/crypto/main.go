@@ -4,12 +4,15 @@ package crypto
 // from https://github.com/Binaryify/NeteaseCloudMusicApi/blob/master/util/crypto.js
 
 import (
+	"bytes"
 	"crypto/aes"
 	"crypto/cipher"
+	"crypto/md5"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/base64"
+	"encoding/hex"
 	"encoding/pem"
 	"errors"
 	"io"
@@ -97,25 +100,47 @@ func Decrypt(buffer []byte) ([]byte, error) {
 func WEAPI(data string) (params []byte, encSecKey []byte, err error) {
 	secretKey, err := genRandomBytes(16)
 	if err != nil {
-		return nil, nil, err
+		return
 	}
 	for k, v := range secretKey {
 		secretKey[k] = byte(charCodeAt(base62Encode(int(v)), 0))
 	}
 	presetData, err := AESEncrypt([]byte(data), "cbc", presetKey, iv)
 	if err != nil {
-		return nil, nil, err
+		return
 	}
 	presetDataBase64 := make([]byte, len(presetData))
 	base64.StdEncoding.Encode(presetDataBase64, presetData)
 	secretData, err := AESEncrypt(presetDataBase64, "cbc", secretKey, iv)
 	if err != nil {
-		return nil, nil, err
+		return
 	}
 	base64.StdEncoding.Encode(params, secretData)
 	encSecKey, err = RSAEncrypt(reverse(secretKey), publicKey)
+	return
+}
+
+func LinuxAPI(data string) (eParams []byte, err error) {
+	encrypted, err := AESEncrypt([]byte(data), "ecb", linuxApiKey, nil)
 	if err != nil {
-		return nil, nil, err
+		return
 	}
+	hex.Encode(eParams, encrypted)
+	bytes.ToUpper(eParams)
+	return
+}
+
+func EAPI(url string, data string) (params []byte, err error) {
+	msg := "nobody" + url + "use" + data + "md5forencrypt"
+	h := md5.New()
+	h.Write([]byte(msg))
+	digest := hex.EncodeToString(h.Sum(nil))
+	target := url + "-36cd479b6b5-" + data + "-36cd479b6b5-" + digest
+	encrypted, err := AESEncrypt([]byte(target), "ecb", []byte(eapiKey), nil)
+	if err != nil {
+		return
+	}
+	hex.Encode(params, encrypted)
+	bytes.ToUpper(params)
 	return
 }
