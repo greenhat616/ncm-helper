@@ -1,6 +1,6 @@
 package preStart
 
-func Do () {
+func Do() {
 	initLogDriver()
 	initConfigDriver()
 }

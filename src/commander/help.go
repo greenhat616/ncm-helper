@@ -9,11 +9,11 @@ import (
 
 var h bool
 
-func registerHelpFlag () {
+func registerHelpFlag() {
 	flag.BoolVarP(&h, "help", "h", false, "查看程序帮助")
 }
 
-func handleHelpFlag () {
+func handleHelpFlag() {
 	if h {
 		fmt.Printf(`网易云助手 v%s
 使用: ncm [-dhv] [-c filename]

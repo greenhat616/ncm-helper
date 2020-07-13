@@ -7,10 +7,10 @@ import (
 )
 
 // The Log driver is served by logrus
-func initLogDriver () {
+func initLogDriver() {
 	log.SetFormatter(&log.TextFormatter{
-		ForceColors: true,
-		FullTimestamp: true,
+		ForceColors:     true,
+		FullTimestamp:   true,
 		TimestampFormat: "2006-01-02T15:04:05.999Z",
 	})
 	if config.Debug {

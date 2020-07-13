@@ -3,8 +3,9 @@ package commander
 import (
 	flag "github.com/spf13/pflag"
 )
+
 // Parse params
-func Parse () {
+func Parse() {
 	// Register Flag mapping
 	registerVersionFlag()
 	registerHelpFlag()

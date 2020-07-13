@@ -10,12 +10,11 @@ import (
 )
 
 var (
-	BuildTag = "Unknown"
-	BuildTime = "Unknown"
+	BuildTag    = "Unknown"
+	BuildTime   = "Unknown"
 	MakeVersion = "Unknown"
-	Version = "development"
+	Version     = "development"
 )
-
 
 func init() {
 	// global set build information

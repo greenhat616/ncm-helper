@@ -5,6 +5,6 @@ import (
 	flag "github.com/spf13/pflag"
 )
 
-func registerDebugFlag () {
+func registerDebugFlag() {
 	flag.BoolVarP(&config.Debug, "debug", "d", false, "启动调试模式")
 }
