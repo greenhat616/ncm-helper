@@ -16,6 +16,7 @@ import (
 	"encoding/pem"
 	"errors"
 	"io"
+	"math/big"
 )
 
 var (
@@ -23,9 +24,12 @@ var (
 	presetKey   = []byte("0CoJUm6Qyw8W8jud")
 	linuxApiKey = []byte("rFgB&h#%2?^eDg:Q")
 	base62      = []string{"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0"}
-	publicKey   = "-----BEGIN PUBLIC KEY-----\\nMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDgtQn2JZ34ZC28NWYpAUd98iZ37BUrX/aKzmFbt7clFSs6sXqHauqKWqdtLkF2KexO40H1YTX8z2lSgBBOAxLsvaklV8k4cBFK9snQXE9/DDaFt6Rr7iVZMldczhC0JNgTz+SHXT6CBHuX3e9SdB1Ua44oncaTWz7OBGLbCiK45wIDAQAB\\n-----END PUBLIC KEY-----"
+	publicKey   = `-----BEGIN PUBLIC KEY-----
+MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDgtQn2JZ34ZC28NWYpAUd98iZ37BUrX/aKzmFbt7clFSs6sXqHauqKWqdtLkF2KexO40H1YTX8z2lSgBBOAxLsvaklV8k4cBFK9snQXE9/DDaFt6Rr7iVZMldczhC0JNgTz+SHXT6CBHuX3e9SdB1Ua44oncaTWz7OBGLbCiK45wIDAQAB
+-----END PUBLIC KEY-----`
 	eapiKey     = "e82ckenh8dichen8"
 )
+var util IUtil = &Util{}
 
 func AESEncrypt(buffer []byte, mode string, key []byte, iv []byte) ([]byte, error) {
 	block, err := aes.NewCipher(key)
@@ -45,15 +49,13 @@ func AESEncrypt(buffer []byte, mode string, key []byte, iv []byte) ([]byte, erro
 		cipherText := c.Seal(nil, nonce, buffer, nil)
 		return cipherText, nil
 	} else if mode == "cbc" {
-		if len(buffer)%aes.BlockSize != 0 {
-			return nil, errors.New("plaintext is not a multiple of the block size")
-		}
-		buffer = PKCS7Padding(buffer, block.BlockSize())
-		c := cipher.NewCBCEncrypter(block, iv)
+		buffer = util.PKCS7Padding(buffer, block.BlockSize())
 		cipherText := make([]byte, len(buffer))
+		c := cipher.NewCBCEncrypter(block, iv)
 		c.CryptBlocks(cipherText, buffer)
+		return cipherText, nil
 	} else if mode == "ecb" {
-		buffer = PKCS7Padding(buffer, block.BlockSize())
+		buffer = util.PKCS7Padding(buffer, block.BlockSize())
 		encrypted := make([]byte, len(buffer))
 		size := block.BlockSize()
 		for bs, be := 0, size; bs < len(buffer); bs, be = bs+size, be+size {
@@ -64,7 +66,7 @@ func AESEncrypt(buffer []byte, mode string, key []byte, iv []byte) ([]byte, erro
 	return nil, errors.New("mismatch mode")
 }
 
-func RSAEncrypt(buffer []byte, key string) ([]byte, error) {
+func RSAEncryptWithNoPadding(buffer []byte, key string) ([]byte, error) {
 	// 解密 pem 格式的公钥
 	block, _ := pem.Decode([]byte(key))
 	if block == nil {
@@ -77,46 +79,62 @@ func RSAEncrypt(buffer []byte, key string) ([]byte, error) {
 	}
 	// 类型断言
 	pub := pubInterface.(*rsa.PublicKey)
+
 	// 加密
-	return rsa.EncryptPKCS1v15(rand.Reader, pub, buffer)
+	c := new(big.Int).SetBytes(buffer)
+	return c.Exp(c, big.NewInt(int64(pub.E)), pub.N).Bytes(), nil
+
 }
 
-func Decrypt(buffer []byte) ([]byte, error) {
-	cipher, err := aes.NewCipher(generateKey([]byte(eapiKey)))
-	if err != nil {
-		return nil, err
-	}
-	decrypted := make([]byte, len(buffer))
-	for bs, be := 0, cipher.BlockSize(); bs < len(buffer); bs, be = bs+cipher.BlockSize(), be+cipher.BlockSize() {
+func Decrypt(buffer []byte) (decrypted []byte, err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			switch x := r.(type) {
+			case string:
+				err = errors.New(x)
+			case error:
+				err = x
+			default:
+				err = errors.New("unknown error")
+			}
+		}
+	}()
+	cipher, _ := aes.NewCipher([]byte(eapiKey))
+	decrypted = make([]byte, len(buffer))
+	size := 16
+
+	for bs, be := 0, size; bs < len(buffer); bs, be = bs+size, be+size {
 		cipher.Decrypt(decrypted[bs:be], buffer[bs:be])
 	}
-	trim := 0
-	if len(decrypted) > 0 {
-		trim = len(decrypted) - int(decrypted[len(decrypted)-1])
-	}
-	return decrypted[:trim], nil
+	return
 }
 
 func WEAPI(data string) (params []byte, encSecKey []byte, err error) {
-	secretKey, err := genRandomBytes(16)
+	secretKey, err := util.GenRandomBytes(16)
+	// fmt.Printf("%v", secretKey)
 	if err != nil {
 		return
 	}
 	for k, v := range secretKey {
-		secretKey[k] = byte(charCodeAt(base62Encode(int(v)), 0))
+		secretKey[k] = byte(util.charCodeAt(util.base62Encode(int(v)), 0))
 	}
+	// fmt.Printf("%v", secretKey)
 	presetData, err := AESEncrypt([]byte(data), "cbc", presetKey, iv)
 	if err != nil {
 		return
 	}
-	presetDataBase64 := make([]byte, len(presetData))
+	// fmt.Printf("%v", presetData)
+	presetDataBase64 := make([]byte, base64.StdEncoding.EncodedLen(len(presetData)))
 	base64.StdEncoding.Encode(presetDataBase64, presetData)
 	secretData, err := AESEncrypt(presetDataBase64, "cbc", secretKey, iv)
 	if err != nil {
 		return
 	}
+	params = make([]byte, base64.StdEncoding.EncodedLen(len(secretData)))
 	base64.StdEncoding.Encode(params, secretData)
-	encSecKey, err = RSAEncrypt(reverse(secretKey), publicKey)
+	encSecKeyBytes, err := RSAEncryptWithNoPadding(util.reverse(secretKey), publicKey)
+	encSecKey = make([]byte, hex.EncodedLen(len(encSecKeyBytes)))
+	hex.Encode(encSecKey, encSecKeyBytes)
 	return
 }
 
@@ -125,8 +143,9 @@ func LinuxAPI(data string) (eParams []byte, err error) {
 	if err != nil {
 		return
 	}
+	eParams = make([]byte, hex.EncodedLen(len(encrypted)))
 	hex.Encode(eParams, encrypted)
-	bytes.ToUpper(eParams)
+	eParams = bytes.ToUpper(eParams)
 	return
 }
 
@@ -140,7 +159,8 @@ func EAPI(url string, data string) (params []byte, err error) {
 	if err != nil {
 		return
 	}
+	params = make([]byte, hex.EncodedLen(len(encrypted)))
 	hex.Encode(params, encrypted)
-	bytes.ToUpper(params)
+	params = bytes.ToUpper(params)
 	return
 }
