@@ -32,10 +32,10 @@ jobs:
           ${{ runner.os }}-go-
     - name: Get dependencies
       run: |
-        go mod tidy 
-    
+        go mod tidy
+    - name: Check Make is installed
+      run: make -v
     - name: Build
-      run: go build -v .
-
+      run: make build
     - name: Test
-      run: go test -v .
+      run: make test
