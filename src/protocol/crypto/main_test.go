@@ -44,7 +44,7 @@ func TestWEAPI(t *testing.T) {
 		return
 	}
 	// TestWEAPI
-	params, enSecKey, err := WEAPI("{ nickname: 'test' }")
+	params, enSecKey, err := WEAPI([]byte("{ nickname: 'test' }"))
 	if err != nil {
 		t.Error(err)
 		t.Fail()
@@ -57,7 +57,7 @@ func TestWEAPI(t *testing.T) {
 }
 
 func TestLinuxAPI(t *testing.T) {
-	eParams, err := LinuxAPI("{\"a\":1}")
+	eParams, err := LinuxAPI([]byte("{\"a\":1}"))
 	if err != nil {
 		t.Error(err)
 		t.Fail()
@@ -71,7 +71,7 @@ func TestLinuxAPI(t *testing.T) {
 // TODO: Test Decrypt func, not found a valid test data source.
 
 func TestEAPI(t *testing.T) {
-	params, err := EAPI("/api/cellphone/existence/check", "{\"a\":1}")
+	params, err := EAPI("/api/cellphone/existence/check", []byte("{\"a\":1}"))
 	if err != nil {
 		t.Error(err)
 		t.Fail()

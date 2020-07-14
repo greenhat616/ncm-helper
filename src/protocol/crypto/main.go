@@ -109,7 +109,7 @@ func Decrypt(buffer []byte) (decrypted []byte, err error) {
 	return
 }
 
-func WEAPI(data string) (params []byte, encSecKey []byte, err error) {
+func WEAPI(data []byte) (params []byte, encSecKey []byte, err error) {
 	secretKey, err := util.GenRandomBytes(16)
 	// fmt.Printf("%v", secretKey)
 	if err != nil {
@@ -119,7 +119,7 @@ func WEAPI(data string) (params []byte, encSecKey []byte, err error) {
 		secretKey[k] = byte(util.charCodeAt(util.base62Encode(int(v)), 0))
 	}
 	// fmt.Printf("%v", secretKey)
-	presetData, err := AESEncrypt([]byte(data), "cbc", presetKey, iv)
+	presetData, err := AESEncrypt(data, "cbc", presetKey, iv)
 	if err != nil {
 		return
 	}
@@ -138,8 +138,8 @@ func WEAPI(data string) (params []byte, encSecKey []byte, err error) {
 	return
 }
 
-func LinuxAPI(data string) (eParams []byte, err error) {
-	encrypted, err := AESEncrypt([]byte(data), "ecb", linuxApiKey, nil)
+func LinuxAPI(data []byte) (eParams []byte, err error) {
+	encrypted, err := AESEncrypt(data, "ecb", linuxApiKey, nil)
 	if err != nil {
 		return
 	}
@@ -149,12 +149,12 @@ func LinuxAPI(data string) (eParams []byte, err error) {
 	return
 }
 
-func EAPI(url string, data string) (params []byte, err error) {
-	msg := "nobody" + url + "use" + data + "md5forencrypt"
+func EAPI(url string, data []byte) (params []byte, err error) {
+	msg := "nobody" + url + "use" + string(data) + "md5forencrypt"
 	h := md5.New()
 	h.Write([]byte(msg))
 	digest := hex.EncodeToString(h.Sum(nil))
-	target := url + "-36cd479b6b5-" + data + "-36cd479b6b5-" + digest
+	target := url + "-36cd479b6b5-" + string(data) + "-36cd479b6b5-" + digest
 	encrypted, err := AESEncrypt([]byte(target), "ecb", []byte(eapiKey), nil)
 	if err != nil {
 		return
