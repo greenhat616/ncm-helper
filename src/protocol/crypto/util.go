@@ -8,9 +8,9 @@ import (
 	"strings"
 )
 
-type Util struct {}
+type Util struct{}
 type IUtil interface {
-	GenRandomBytes (size int) (blk []byte, err error)
+	GenRandomBytes(size int) (blk []byte, err error)
 	PKCS7Padding(cipherText []byte, blockSize int) []byte
 	PKCS7UnPadding(origData []byte) []byte
 	reverse(s []byte) []byte
@@ -62,7 +62,7 @@ func (*Util) charCodeAt(s string, n int) rune {
 	return 0
 }
 
-func (*Util) GenRandomBytes (size int) (blk []byte, err error) {
+func (*Util) GenRandomBytes(size int) (blk []byte, err error) {
 	blk = make([]byte, size)
 	_, err = rand.Read(blk)
 	return

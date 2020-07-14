@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestWEAPI (t *testing.T) {
+func TestWEAPI(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 	m := NewMockIUtil(ctrl)
