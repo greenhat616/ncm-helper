@@ -1,4 +1,4 @@
 build:
-	go -v .
+	go build -v .
 test:
 	go test -v ./...
