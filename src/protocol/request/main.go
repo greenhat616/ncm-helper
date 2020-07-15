@@ -1,14 +1,16 @@
 package request
 
 import (
-	"encoding/json"
 	"github.com/a632079/ncm-helper/src/protocol/crypto"
 	"github.com/go-resty/resty/v2"
+	jsoniter "github.com/json-iterator/go"
 	"github.com/pkg/errors"
 	"math/rand"
 	"net/http"
 	"time"
 )
+
+var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
 var (
 	userAgentList = []string{
