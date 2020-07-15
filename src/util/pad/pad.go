@@ -1,4 +1,5 @@
 package pad
+
 /*
 Package pad provides left-padding functionality,
 Copyright: https://github.com/willf/pad

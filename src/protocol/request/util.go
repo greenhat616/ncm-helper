@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-func performRequest (r *resty.Request, method string, url string) (resp *resty.Response, err error) {
+func performRequest(r *resty.Request, method string, url string) (resp *resty.Response, err error) {
 	method = strings.ToUpper(method)
 	if method == "GET" {
 		resp, err = r.Get(url)
@@ -26,23 +26,23 @@ func performRequest (r *resty.Request, method string, url string) (resp *resty.R
 	}
 }
 
-func handleResponse (resp *resty.Response) (response *APIResponse, err error) {
+func handleResponse(resp *resty.Response) (response *APIResponse, err error) {
 	if resp.StatusCode() == 200 {
 		response = &APIResponse{
 			StatusCode: resp.StatusCode(),
-			Cookies: resp.Cookies(),
-			Data: resp.Body(),
+			Cookies:    resp.Cookies(),
+			Data:       resp.Body(),
 		}
 		return
 	} else {
-		err = errors.New(fmt.Sprintf("request failed, status code: " + strconv.Itoa(resp.StatusCode()) + ", data: %s", resp.Request.Body))
+		err = errors.New(fmt.Sprintf("request failed, status code: "+strconv.Itoa(resp.StatusCode())+", data: %s", resp.Request.Body))
 		return
 	}
 }
 
-func preFillHeader (method string, url string, options Options) (map[string]string, string) {
-	headers := map[string]string {}
-	re :=regexp.MustCompile("/\\w*api/")
+func preFillHeader(method string, url string, options Options) (map[string]string, string) {
+	headers := map[string]string{}
+	re := regexp.MustCompile("/\\w*api/")
 	if options.Crypto == "weapi" {
 		headers["User-Agent"] = chooseUserAgent(options.UA)
 		url = re.ReplaceAllString(url, "weapi")
@@ -65,7 +65,7 @@ func preFillHeader (method string, url string, options Options) (map[string]stri
 	return headers, url
 }
 
-func setDefaultValue (headers map[string]string, name string, value string) map[string]string {
+func setDefaultValue(headers map[string]string, name string, value string) map[string]string {
 	_, ok := headers[name]
 	if !ok {
 		headers[name] = value
@@ -73,7 +73,7 @@ func setDefaultValue (headers map[string]string, name string, value string) map[
 	return headers
 }
 
-func genRequestId () string {
+func genRequestId() string {
 	ms := time.Now().UnixNano() / 1e6
 	rand.Seed(time.Now().Unix())
 	r := strconv.Itoa(rand.Intn(1000))

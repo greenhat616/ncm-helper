@@ -29,10 +29,10 @@ var (
 	}
 )
 
-func chooseUserAgent (ua *string) string {
+func chooseUserAgent(ua *string) string {
 	index := 0
 	rand.Seed(time.Now().UnixNano())
-	if *ua == "mobile"{
+	if *ua == "mobile" {
 		index = rand.Intn(7)
 	} else if *ua == "pc" {
 		index = rand.Intn(5) + 8
@@ -44,19 +44,19 @@ func chooseUserAgent (ua *string) string {
 
 type Options struct {
 	Cookies []*http.Cookie
-	UA *string
-	IP *string // X-Real-IP IPV4
-	Crypto string
-	URL *string // eapi is needed
+	UA      *string
+	IP      *string // X-Real-IP IPV4
+	Crypto  string
+	URL     *string // eapi is needed
 }
 
 type APIResponse struct {
 	StatusCode int
-	Cookies []*http.Cookie
-	Data []byte
+	Cookies    []*http.Cookie
+	Data       []byte
 }
 
-func CreateWEAPIRequest (method string, url string, data map[string]interface{}, options Options) (response *APIResponse, err error) {
+func CreateWEAPIRequest(method string, url string, data map[string]interface{}, options Options) (response *APIResponse, err error) {
 	headers, url := preFillHeader(method, url, options)
 	// set CSRF Token
 	for _, v := range options.Cookies {
@@ -75,8 +75,8 @@ func CreateWEAPIRequest (method string, url string, data map[string]interface{},
 	r := client.R().
 		SetQueryParams(headers).
 		SetCookies(options.Cookies).
-		SetBody(map[string]interface{} {
-			"params": params,
+		SetBody(map[string]interface{}{
+			"params":    params,
 			"encSecKey": encSecKey,
 		})
 	resp, err := performRequest(r, method, url)
@@ -86,14 +86,14 @@ func CreateWEAPIRequest (method string, url string, data map[string]interface{},
 	return handleResponse(resp)
 }
 
-func CreateEAPIRequest (method string, url string, data map[string]interface{}, options Options) (response *APIResponse, err error)  {
+func CreateEAPIRequest(method string, url string, data map[string]interface{}, options Options) (response *APIResponse, err error) {
 	// check options
 	if options.URL == nil {
 		err = errors.New("request failed: url in options is not set")
 		return
 	}
 	_, url = preFillHeader(method, url, options)
-	headers := map[string]string {}
+	headers := map[string]string{}
 
 	// set headers
 	for _, v := range options.Cookies {
@@ -109,7 +109,7 @@ func CreateEAPIRequest (method string, url string, data map[string]interface{}, 
 			"channel",
 			"MUSIC_U",
 			"MUSIC_A":
-				headers[v.Name] = v.Value
+			headers[v.Name] = v.Value
 		}
 	}
 
@@ -137,7 +137,7 @@ func CreateEAPIRequest (method string, url string, data map[string]interface{}, 
 		R().
 		SetHeaders(headers).
 		SetCookies(options.Cookies).
-		SetBody(map[string]interface{} {
+		SetBody(map[string]interface{}{
 			"params": params,
 		})
 	resp, err := performRequest(r, method, url)
@@ -157,11 +157,11 @@ func CreateEAPIRequest (method string, url string, data map[string]interface{}, 
 	return
 }
 
-func CreateLinuxApiRequest (method string, url string, data map[string]interface{}, options Options) (response *APIResponse, err error) {
+func CreateLinuxApiRequest(method string, url string, data map[string]interface{}, options Options) (response *APIResponse, err error) {
 	headers, url := preFillHeader(method, url, options)
-	raw := map[string]interface{} {
+	raw := map[string]interface{}{
 		"method": method,
-		"url": url,
+		"url":    url,
 		"params": data,
 	}
 	d, err := json.Marshal(raw)
@@ -179,7 +179,7 @@ func CreateLinuxApiRequest (method string, url string, data map[string]interface
 		R().
 		SetHeaders(headers).
 		SetCookies(options.Cookies).
-		SetBody(map[string]interface{} {
+		SetBody(map[string]interface{}{
 			"eparams": eParams,
 		})
 	resp, err := performRequest(r, method, url)
@@ -189,7 +189,7 @@ func CreateLinuxApiRequest (method string, url string, data map[string]interface
 	return handleResponse(resp)
 }
 
-func CreateRequest (method string, url string, data map[string]interface{}, options Options) (response *APIResponse, err error) {
+func CreateRequest(method string, url string, data map[string]interface{}, options Options) (response *APIResponse, err error) {
 	switch options.Crypto {
 	case "weapi":
 		return CreateRequest(method, url, data, options)

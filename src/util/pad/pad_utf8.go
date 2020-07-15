@@ -3,7 +3,6 @@ package pad
 import "unicode/utf8"
 
 type utf8S struct {
-
 }
 
 var UTF8 = &utf8S{}

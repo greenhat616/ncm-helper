@@ -1,8 +1,8 @@
 package pad
 
 import (
-"testing"
-"testing/quick"
+	"testing"
+	"testing/quick"
 )
 
 func TestLeftEqualWithSameLength(t *testing.T) {
