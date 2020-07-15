@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"github.com/a632079/ncm-helper/src/protocol/crypto"
 	"github.com/go-resty/resty/v2"
+	"github.com/pkg/errors"
 	"math/rand"
 	"net/http"
-	"strings"
 	"time"
 )
 
@@ -45,18 +45,19 @@ func chooseUserAgent (ua *string) string {
 type Options struct {
 	Cookies []*http.Cookie
 	UA *string
+	IP *string // X-Real-IP IPV4
+	Crypto string
+	URL *string // eapi is needed
 }
 
-func CreateWEAPIRequest (method string, url string, data map[string]interface{}, options Options) (err) {
-	headers := map[string]string {
-		"User-Agent": chooseUserAgent(options.UA),
-	}
-	if strings.ToUpper(method) == "POST" {
-		headers["Content-Type"] = "application/x-www-form-urlencoded"
-	}
-	if strings.Contains(url, "music.163.com") {
-		headers["Content-Type"] = "https://music.163.com"
-	}
+type APIResponse struct {
+	StatusCode int
+	Cookies []*http.Cookie
+	Data []byte
+}
+
+func CreateWEAPIRequest (method string, url string, data map[string]interface{}, options Options) (response *APIResponse, err error) {
+	headers, url := preFillHeader(method, url, options)
 	// set CSRF Token
 	for _, v := range options.Cookies {
 		if v.Name == "_csrf" {
@@ -68,19 +69,136 @@ func CreateWEAPIRequest (method string, url string, data map[string]interface{},
 	if err != nil {
 		return
 	}
-	crypto.WEAPI(d)
+	params, encSecKey, err := crypto.WEAPI(d)
+
 	client := resty.New()
-	client.
-		R().
+	r := client.R().
 		SetQueryParams(headers).
-		SetCookies(options.Cookies)
+		SetCookies(options.Cookies).
+		SetBody(map[string]interface{} {
+			"params": params,
+			"encSecKey": encSecKey,
+		})
+	resp, err := performRequest(r, method, url)
+	if err != nil {
+		return
+	}
+	return handleResponse(resp)
 }
 
-func CreateEAPIRequest () {
+func CreateEAPIRequest (method string, url string, data map[string]interface{}, options Options) (response *APIResponse, err error)  {
+	// check options
+	if options.URL == nil {
+		err = errors.New("request failed: url in options is not set")
+		return
+	}
+	_, url = preFillHeader(method, url, options)
+	headers := map[string]string {}
 
+	// set headers
+	for _, v := range options.Cookies {
+		switch v.Name {
+		case "__csrf",
+			"deviceId",
+			"appver",
+			"versioncode",
+			"mobilename",
+			"buildver",
+			"resolution",
+			"os",
+			"channel",
+			"MUSIC_U",
+			"MUSIC_A":
+				headers[v.Name] = v.Value
+		}
+	}
+
+	// set Default value
+	headers = setDefaultValue(headers, "appver", "6.1.1")
+	headers = setDefaultValue(headers, "versioncode", "140")
+	headers = setDefaultValue(headers, "buildver", string(time.Now().Unix()))
+	headers = setDefaultValue(headers, "resolution", "1920x1080")
+	headers = setDefaultValue(headers, "os", "android")
+	headers["requestId"] = genRequestId()
+
+	// encrypted data
+	data["headers"] = headers
+	raw, err := json.Marshal(data)
+	if err != nil {
+		return
+	}
+	params, err := crypto.EAPI(url, raw)
+	if err != nil {
+		return
+	}
+
+	// perform request
+	r := resty.New().
+		R().
+		SetHeaders(headers).
+		SetCookies(options.Cookies).
+		SetBody(map[string]interface{} {
+			"params": params,
+		})
+	resp, err := performRequest(r, method, url)
+	if err != nil {
+		return
+	}
+
+	// handle Response
+	response, err = handleResponse(resp)
+	if err != nil {
+		return
+	}
+	decrypted, err := crypto.Decrypt(response.Data)
+	if err == nil {
+		response.Data = decrypted
+	}
+	return
 }
 
-func CreateLinuxApiRequest () {
+func CreateLinuxApiRequest (method string, url string, data map[string]interface{}, options Options) (response *APIResponse, err error) {
+	headers, url := preFillHeader(method, url, options)
+	raw := map[string]interface{} {
+		"method": method,
+		"url": url,
+		"params": data,
+	}
+	d, err := json.Marshal(raw)
+	if err != nil {
+		return
+	}
+	// encrypt data
+	eParams, err := crypto.LinuxAPI(d)
+	if err != nil {
+		return
+	}
+	url = "https://music.163.com/api/linux/forward"
 
+	r := resty.New().
+		R().
+		SetHeaders(headers).
+		SetCookies(options.Cookies).
+		SetBody(map[string]interface{} {
+			"eparams": eParams,
+		})
+	resp, err := performRequest(r, method, url)
+	if err != nil {
+		return
+	}
+	return handleResponse(resp)
 }
 
+func CreateRequest (method string, url string, data map[string]interface{}, options Options) (response *APIResponse, err error) {
+	switch options.Crypto {
+	case "weapi":
+		return CreateRequest(method, url, data, options)
+	case "linuxapi":
+		return CreateLinuxApiRequest(method, url, data, options)
+	case "eapi":
+		return CreateEAPIRequest(method, url, data, options)
+	default:
+		err = errors.New("mismatch crypto type")
+		return
+	}
+}

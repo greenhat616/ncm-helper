@@ -3,8 +3,9 @@ module github.com/a632079/ncm-helper
 go 1.14
 
 require (
-	github.com/go-resty/resty/v2 v2.3.0 // indirect
+	github.com/go-resty/resty/v2 v2.3.0
 	github.com/golang/mock v1.4.3
+	github.com/pkg/errors v0.8.1
 	github.com/sirupsen/logrus v1.6.0
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.7.0
