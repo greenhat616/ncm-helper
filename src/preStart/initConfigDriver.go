@@ -11,6 +11,7 @@ import (
 
 // The Config Parse Driver is served by viper
 func initConfigDriver() {
+	config.SetDefault()
 	// Parse env config
 	viper.SetEnvPrefix("ncm") // like: NCM_PORT=8000
 	viper.AutomaticEnv()
