@@ -17,7 +17,7 @@ require (
 	github.com/json-iterator/go v1.1.10
 	github.com/mitchellh/mapstructure v1.3.2 // indirect
 	github.com/pelletier/go-toml v1.8.0 // indirect
-	github.com/pkg/errors v0.9.1
+	github.com/pkg/errors v0.8.1
 	github.com/sirupsen/logrus v1.6.0
 	github.com/spf13/afero v1.3.2 // indirect
 	github.com/spf13/cast v1.3.1 // indirect
@@ -31,4 +31,5 @@ require (
 	golang.org/x/text v0.3.3 // indirect
 	google.golang.org/protobuf v1.25.0 // indirect
 	gopkg.in/ini.v1 v1.57.0 // indirect
+	gopkg.in/yaml.v2 v2.3.0 // indirect
 )
