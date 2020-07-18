@@ -31,12 +31,12 @@ var (
 	}
 )
 
-func chooseUserAgent(ua *string) string {
+func chooseUserAgent(ua string) string {
 	index := 0
 	rand.Seed(time.Now().UnixNano())
-	if *ua == "mobile" {
+	if ua == "mobile" {
 		index = rand.Intn(7)
-	} else if *ua == "pc" {
+	} else if ua == "pc" {
 		index = rand.Intn(5) + 8
 	} else {
 		index = rand.Intn(len(userAgentList))
@@ -46,10 +46,10 @@ func chooseUserAgent(ua *string) string {
 
 type Options struct {
 	Cookies []*http.Cookie
-	UA      *string
-	IP      *string // X-Real-IP IPV4
+	UA      string
+	IP      string // X-Real-IP IPV4
 	Crypto  string
-	URL     *string // eapi is needed
+	URL     string // eapi is needed
 }
 
 type APIResponse struct {
@@ -90,7 +90,7 @@ func CreateWEAPIRequest(method string, url string, data map[string]interface{}, 
 
 func CreateEAPIRequest(method string, url string, data map[string]interface{}, options Options) (response *APIResponse, err error) {
 	// check options
-	if options.URL == nil {
+	if options.URL == "" {
 		err = errors.New("request failed: url in options is not set")
 		return
 	}

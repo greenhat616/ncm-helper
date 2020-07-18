@@ -27,17 +27,16 @@ func performRequest(r *resty.Request, method string, url string) (resp *resty.Re
 }
 
 func handleResponse(resp *resty.Response) (response *APIResponse, err error) {
-	if resp.StatusCode() == 200 {
-		response = &APIResponse{
-			StatusCode: resp.StatusCode(),
-			Cookies:    resp.Cookies(),
-			Data:       resp.Body(),
-		}
-		return
-	} else {
+	response = &APIResponse{
+		StatusCode: resp.StatusCode(),
+		Cookies:    resp.Cookies(),
+		Data:       resp.Body(),
+	}
+	if resp.StatusCode() != 200 {
 		err = errors.New(fmt.Sprintf("request failed, status code: "+strconv.Itoa(resp.StatusCode())+", data: %s", resp.Request.Body))
 		return
 	}
+	return
 }
 
 func preFillHeader(method string, url string, options Options) (map[string]string, string) {
@@ -59,8 +58,8 @@ func preFillHeader(method string, url string, options Options) (map[string]strin
 	if strings.Contains(url, "music.163.com") {
 		headers["Content-Type"] = "https://music.163.com"
 	}
-	if options.IP != nil {
-		headers["X-Real-IP"] = *options.IP
+	if options.IP != "" {
+		headers["X-Real-IP"] = options.IP
 	}
 	return headers, url
 }
