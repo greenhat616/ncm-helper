@@ -7,6 +7,10 @@ import (
 )
 
 func (p *NCM) SignIn(t int) (err error) {
+	if !p.isLogin {
+		err = errors.New("未登录")
+		return
+	}
 	data := map[string]interface{}{
 		"type": t,
 	}
