@@ -45,6 +45,7 @@ func (p *NCM) phoneLogin(phone string, countyCode string, password string, isMD5
 	}
 	// request success
 	p.Cookies = resp.Cookies
+	p.isLogin = true
 	return
 }
 
@@ -80,6 +81,7 @@ func (p *NCM) emailLogin(email string, password string, isMD5Password bool) (err
 		return
 	}
 	p.Cookies = resp.Cookies
+	p.isLogin = true
 	return
 }
 
@@ -106,6 +108,8 @@ func (p *NCM) CheckLogin(cookies []*http.Cookie) (err error) {
 	len2 := len(re2.FindAllString(resp.String(), -1))
 	if len1 < 2 || len2 < 2 {
 		err = errors.New("can't match data, might don't login.")
+	} else {
+		p.isLogin = true
 	}
 	return
 }

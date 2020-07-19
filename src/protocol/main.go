@@ -14,6 +14,7 @@ type NCM struct {
 	Pass    string
 	MD5Pass string
 	Phone   string
+	isLogin bool
 }
 
 func NewWithEmail(email string, pass string, isMD5Pass bool) *NCM {
