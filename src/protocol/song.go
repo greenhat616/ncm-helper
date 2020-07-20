@@ -57,7 +57,8 @@ func (p *NCM) SongURL(songIds []string, br int) (result NeteaseSongURLResponseDa
 	}
 	if n {
 		u := crypto.Util{}
-		k, err := u.GenRandomBytes(16)
+		var k []byte
+		k, err = u.GenRandomBytes(16)
 		if err != nil {
 			return
 		}
