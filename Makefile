@@ -10,17 +10,23 @@ all:
 	build
 
 get-tools:
-	go get -u golang.org/x/lint/golint
+	@echo Installing tools...
+	go get -u github.com/mgechev/revive
 
-dep: # get dependence
+dep: # get dependencies
+	@echo Installing Dependencies...
 	@go mod download
 
 lint: get-tools ## Lint Golang files
-	@golint -set_exit_status ${PKG_LIST}
+	@echo
+	@echo Linting go codes...
+	@revive -config ./revive.toml -formatter friendly ${PKG_LIST}
 
 build: dep
-	@echo Building...
-	@go build -v .
+	@echo;
+	@echo Building...;
+	@mkdir -p dist;
+	@go build -v -o dist/${PROJECT_NAME} .;
 
 test:
 	@echo Testing...
