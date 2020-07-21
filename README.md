@@ -3,6 +3,16 @@
 这是一个实验性（还在活跃开发中）的项目，因此缺乏特性说明。  
 当项目进入 **稳定**(Stable) 阶段，我们将补充配置，特性等说明。
 
+<div align="center">
+
+![Go](https://github.com/greenhat616/ncm-helper/workflows/Go/badge.svg)
+![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/greenhat616/ncm-helper)
+[![Maintainability](https://api.codeclimate.com/v1/badges/3eedabb10c8fa983538d/maintainability)](https://codeclimate.com/github/greenhat616/ncm-helper/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/3eedabb10c8fa983538d/test_coverage)](https://codeclimate.com/github/greenhat616/ncm-helper/test_coverage)
+![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/greenhat616/ncm-helper?sort=semver)
+
+</div>
+
 ## 状态：开发
 * 新特性会不断添加
 * 机制存在缺陷，甚至不能运行
