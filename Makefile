@@ -15,18 +15,22 @@ get-tools:
 
 dep: # get dependencies
 	@echo Installing Dependencies...
-	@go mod download
+	go mod download
 
 lint: get-tools ## Lint Golang files
 	@echo
-	@echo Linting go codes...
+	@echo Linting go codes with revive...
 	@revive -config ./revive.toml -formatter friendly ${PKG_LIST}
+
+vet:
+	@echo Linting go codes with go vet...
+	go vet ./...
 
 build: dep
 	@echo;
 	@echo Building...;
 	@mkdir -p dist;
-	@go build -v -o dist/${PROJECT_NAME} .;
+	go build -v -o dist/${PROJECT_NAME} .;
 
 test:
 	@echo Testing...
@@ -37,5 +41,5 @@ test-coverage:
 	@cat cover.out >> coverage.txt
 
 clean:
-	rm -f coverage.txt
-	rm -f cover.out
+	@rm -f coverage.txt
+	@rm -f cover.out
