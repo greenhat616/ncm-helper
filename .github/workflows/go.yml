@@ -33,9 +33,18 @@ jobs:
     - name: Get dependencies
       run: |
         go mod tidy
-    - name: Check Make is installed
+    - name: Check Make
       run: make -v
     - name: Build
       run: make build
     - name: Test
       run: make test
+    - name: Test Coverage
+      run: make coverage
+    - name: Post Codecov
+      uses: codecov/codecov-action@v1
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        file: coverage.xml
+    - name: Clean Make
+      run: make clean
