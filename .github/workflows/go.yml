@@ -45,6 +45,7 @@ jobs:
       uses: codecov/codecov-action@v1
       with:
         token: ${{ secrets.CODECOV_TOKEN }}
-        file: coverage.xml
+        file: ./coverage.xml
+        files: ./coverage.xml
     - name: Clean Make
       run: make clean
