@@ -68,7 +68,12 @@ jobs:
       - name: Lint Go Code with go vet
         run: make vet
       - name: Lint Go code with revive
-        run: make lint
+        uses: morphy2k/revive-action@v1
+        with:
+          config: ./revive.toml
+          path: ./...
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   build:
     name: Build
