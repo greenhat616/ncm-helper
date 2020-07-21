@@ -38,40 +38,40 @@ jobs:
       run: make build
     - name: Test
       run: make test
-
+  
   coverage:
     name: Coverage
     strategy:
       matrix:
         go-version: [1.14.x]
         platform: [ubuntu-latest]
-      runs-on: ${{ matrix.platform }}
-      steps:
-        - name: Set up Go 1.x
-          uses: actions/setup-go@v2
-          with:
-            go-version: ${{ matrix.go-version }}
-            id: go
-        - name: Check out code into the Go module directory
-          uses: actions/checkout@v2
-        - name: Cache Go module
-          uses: actions/cache@v2
-            with:
-              path: ~/go/pkg/mod
-              key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-              restore-keys: |
-                ${{ runner.os }}-go-
-        - name: Get dependencies
-          run: |
-            go mod tidy
-        - name: Check Make
-          run: make -v
-        - name: Test Coverage
-          run: make coverage
-        - name: Post Codecov
-          uses: codecov/codecov-action@v1
-          with:
-            token: ${{ secrets.CODECOV_TOKEN }}
-            file: ./coverage.txt
-        - name: Clean Make
-          run: make clean
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - name: Set up Go 1.x
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ matrix.go-version }}
+          id: go
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v2
+      - name: Cache Go module
+        uses: actions/cache@v2
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+      - name: Get dependencies
+        run: |
+          go mod tidy
+      - name: Check Make
+        run: make -v
+      - name: Test Coverage
+        run: make coverage
+      - name: Post Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: ./coverage.txt
+      - name: Clean Make
+        run: make clean
