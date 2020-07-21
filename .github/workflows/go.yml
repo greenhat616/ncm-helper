@@ -65,11 +65,10 @@ jobs:
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: |
             ${{ runner.os }}-go-
-      - name: Lint Go Code
-        run: |
-          export PATH=$PATH:$(go env GOPATH)/bin # temporary fix. See https://github.com/actions/setup-go/issues/14
-          go get -u golang.org/x/lint/golint
-          make lint
+      - name: Lint Go Code with go vet
+        run: make vet
+      - name: Lint Go code with revive
+        run: make lint
 
   build:
     name: Build
