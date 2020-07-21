@@ -31,39 +31,48 @@ MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDgtQn2JZ34ZC28NWYpAUd98iZ37BUrX/aKzmFbt7cl
 )
 var util IUtil = &Util{}
 
-func AESEncrypt(buffer []byte, mode string, key []byte, iv []byte) ([]byte, error) {
+func AESGCMEncrypt(buffer []byte, key []byte, iv []byte) ([]byte, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return nil, err
 	}
-	if mode == "gcm" {
-		c, err := cipher.NewGCM(block)
-		if err != nil {
-			return nil, err
-		}
-		nonce := make([]byte, 12)
-		if _, err := io.ReadFull(rand.Reader, nonce); err != nil {
-			return nil, err
-		}
-
-		cipherText := c.Seal(nil, nonce, buffer, nil)
-		return cipherText, nil
-	} else if mode == "cbc" {
-		buffer = util.PKCS7Padding(buffer, block.BlockSize())
-		cipherText := make([]byte, len(buffer))
-		c := cipher.NewCBCEncrypter(block, iv)
-		c.CryptBlocks(cipherText, buffer)
-		return cipherText, nil
-	} else if mode == "ecb" {
-		buffer = util.PKCS7Padding(buffer, block.BlockSize())
-		encrypted := make([]byte, len(buffer))
-		size := block.BlockSize()
-		for bs, be := 0, size; bs < len(buffer); bs, be = bs+size, be+size {
-			block.Encrypt(encrypted[bs:be], buffer[bs:be])
-		}
-		return encrypted, nil
+	c, err := cipher.NewGCM(block)
+	if err != nil {
+		return nil, err
 	}
-	return nil, errors.New("mismatch mode")
+	nonce := make([]byte, 12)
+	if _, err := io.ReadFull(rand.Reader, nonce); err != nil {
+		return nil, err
+	}
+
+	cipherText := c.Seal(nil, nonce, buffer, nil)
+	return cipherText, nil
+}
+
+func AESCBCEncrypt(buffer []byte, key []byte, iv []byte) ([]byte, error) {
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		return nil, err
+	}
+	buffer = util.PKCS7Padding(buffer, block.BlockSize())
+	cipherText := make([]byte, len(buffer))
+	c := cipher.NewCBCEncrypter(block, iv)
+	c.CryptBlocks(cipherText, buffer)
+	return cipherText, nil
+}
+
+func AESECBEncrypt(buffer []byte, key []byte, iv []byte) ([]byte, error) {
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		return nil, err
+	}
+	buffer = util.PKCS7Padding(buffer, block.BlockSize())
+	encrypted := make([]byte, len(buffer))
+	size := block.BlockSize()
+	for bs, be := 0, size; bs < len(buffer); bs, be = bs+size, be+size {
+		block.Encrypt(encrypted[bs:be], buffer[bs:be])
+	}
+	return encrypted, nil
 }
 
 func RSAEncryptWithNoPadding(buffer []byte, key string) ([]byte, error) {
@@ -119,14 +128,14 @@ func WEAPI(data []byte) (params []byte, encSecKey []byte, err error) {
 		secretKey[k] = byte(util.charCodeAt(util.base62Encode(int(v)), 0))
 	}
 	// fmt.Printf("%v", secretKey)
-	presetData, err := AESEncrypt(data, "cbc", presetKey, iv)
+	presetData, err := AESCBCEncrypt(data, presetKey, iv)
 	if err != nil {
 		return
 	}
 	// fmt.Printf("%v", presetData)
 	presetDataBase64 := make([]byte, base64.StdEncoding.EncodedLen(len(presetData)))
 	base64.StdEncoding.Encode(presetDataBase64, presetData)
-	secretData, err := AESEncrypt(presetDataBase64, "cbc", secretKey, iv)
+	secretData, err := AESCBCEncrypt(presetDataBase64, secretKey, iv)
 	if err != nil {
 		return
 	}
@@ -139,7 +148,7 @@ func WEAPI(data []byte) (params []byte, encSecKey []byte, err error) {
 }
 
 func LinuxAPI(data []byte) (eParams []byte, err error) {
-	encrypted, err := AESEncrypt(data, "ecb", linuxApiKey, nil)
+	encrypted, err := AESECBEncrypt(data, linuxApiKey, nil)
 	if err != nil {
 		return
 	}
@@ -155,7 +164,7 @@ func EAPI(url string, data []byte) (params []byte, err error) {
 	h.Write([]byte(msg))
 	digest := hex.EncodeToString(h.Sum(nil))
 	target := url + "-36cd479b6b5-" + string(data) + "-36cd479b6b5-" + digest
-	encrypted, err := AESEncrypt([]byte(target), "ecb", []byte(eapiKey), nil)
+	encrypted, err := AESECBEncrypt([]byte(target), []byte(eapiKey), nil)
 	if err != nil {
 		return
 	}
