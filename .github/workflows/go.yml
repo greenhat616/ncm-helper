@@ -31,6 +31,8 @@ jobs:
           ${{ runner.os }}-go-
     - name: Get dependences
       run: make dep
+    - name: Check code issues by vet
+      run: make vet
     - name: Test
       run: make test
     - name: Test Coverage
@@ -51,22 +53,8 @@ jobs:
         platform: [ubuntu-latest]
     runs-on: ${{ matrix.platform }}
     steps:
-      - name: Set up Go 1.x
-        uses: actions/setup-go@v2
-        with:
-          go-version: ${{ matrix.go-version }}
-        id: go
       - name: Check out code into the Go module directory
         uses: actions/checkout@v2
-      - name: Cache Go module
-        uses: actions/cache@v2
-        with:
-          path: ~/go/pkg/mod
-          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
-          restore-keys: |
-            ${{ runner.os }}-go-
-      - name: Lint Go Code with go vet
-        run: make vet
       - name: Lint Go code with revive
         uses: morphy2k/revive-action@v1
         with:
