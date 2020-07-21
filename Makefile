@@ -15,7 +15,7 @@ get-tools:
 dep: # get dependence
 	@go mod download
 
-lint: ## Lint Golang files
+lint: get-tools ## Lint Golang files
 	@golint -set_exit_status ${PKG_LIST}
 
 build: dep
