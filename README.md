@@ -8,7 +8,7 @@
 ![Go](https://github.com/greenhat616/ncm-helper/workflows/Go/badge.svg)
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/greenhat616/ncm-helper)
 [![Maintainability](https://api.codeclimate.com/v1/badges/3eedabb10c8fa983538d/maintainability)](https://codeclimate.com/github/greenhat616/ncm-helper/maintainability)
-[![Test Coverage](https://api.codeclimate.com/v1/badges/3eedabb10c8fa983538d/test_coverage)](https://codeclimate.com/github/greenhat616/ncm-helper/test_coverage)
+[![codecov](https://codecov.io/gh/greenhat616/ncm-helper/branch/master/graph/badge.svg)](https://codecov.io/gh/greenhat616/ncm-helper)
 ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/greenhat616/ncm-helper?sort=semver)
 
 </div>
