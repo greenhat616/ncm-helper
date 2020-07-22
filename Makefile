@@ -20,7 +20,7 @@ dep: # get dependencies
 lint: get-tools ## Lint Golang files
 	@echo
 	@echo Linting go codes with revive...
-	@revive -config ./revive.toml -formatter friendly ${PKG_LIST}
+	@revive -config ./revive.toml -formatter stylish ${PKG_LIST}
 
 vet:
 	@echo Linting go codes with go vet...
