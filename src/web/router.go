@@ -12,6 +12,7 @@ import (
 	"os"
 )
 
+// InitWebServer is a web server register, implemented by gin
 func InitWebServer() *gin.Engine {
 	if config.Debug {
 		gin.SetMode(gin.DebugMode)

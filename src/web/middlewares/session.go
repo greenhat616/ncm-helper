@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Session is a middleware func that register a session driver by Cookie
 func Session(secret string) gin.HandlerFunc {
 	store := cookie.NewStore([]byte(secret))
 	//Also set Secure: true if using SSL, you should though

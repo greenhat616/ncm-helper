@@ -6,6 +6,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Ping is a controller func that impl a Pong response,
+// intended to notify the client that server is ok
 func Ping(c *gin.Context) {
 	util.Success(c, map[string]interface{}{
 		"requestId": requestid.Get(c),

@@ -11,6 +11,7 @@ var errorMessageMap = map[int]string{
 	500: "server error",
 }
 
+// Success is a func that do the common situation of responding successful formation
 func Success(ctx *gin.Context, data map[string]interface{}) {
 	ctx.JSON(200, map[string]interface{}{
 		"code":    200,
@@ -20,6 +21,7 @@ func Success(ctx *gin.Context, data map[string]interface{}) {
 	})
 }
 
+// Fail is a func that do the common situation of responding failed formation
 func Fail(ctx *gin.Context, data map[string]interface{}, code int) {
 	var status int
 	if code <= 0 {
