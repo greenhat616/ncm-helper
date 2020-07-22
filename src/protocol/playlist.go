@@ -90,7 +90,7 @@ func (p *NCM) PlaylistDetail(playlistID string, s int) (result NCMPlaylistDetail
 		return
 	}
 	if result.Code != 200 {
-		log.Error(d)
+		log.Error(result)
 		err = errors.New("查询歌单细节出错")
 	}
 	return
