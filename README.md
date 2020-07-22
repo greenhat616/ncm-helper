@@ -9,7 +9,7 @@
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/greenhat616/ncm-helper)
 [![Codacy Badge](https://api.codacy.com/project/badge/Grade/7b715ad8e0aa45339cbf266286d49196)](https://app.codacy.com/manual/greenhat616/ncm-helper?utm_source=github.com&utm_medium=referral&utm_content=greenhat616/ncm-helper&utm_campaign=Badge_Grade_Dashboard)
 [![Maintainability](https://api.codeclimate.com/v1/badges/3eedabb10c8fa983538d/maintainability)](https://codeclimate.com/github/greenhat616/ncm-helper/maintainability)
-[![GoReportCard](https://goreportcard.com/report/github.com/greenhat616/ncm-helper)](https://goreportcard.com/badge/github.com/greenhat616/ncm-helper)
+[![GoReportCard](https://goreportcard.com/badge/github.com/greenhat616/ncm-helper)](https://goreportcard.com/report/github.com/greenhat616/ncm-helper)
 [![codecov](https://codecov.io/gh/greenhat616/ncm-helper/branch/master/graph/badge.svg)](https://codecov.io/gh/greenhat616/ncm-helper)
 ![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/greenhat616/ncm-helper?sort=semver)
 
