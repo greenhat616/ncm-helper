@@ -3,12 +3,13 @@ package web
 import (
 	"github.com/a632079/ncm-helper/src/config"
 	apiV1 "github.com/a632079/ncm-helper/src/web/controllers/api/v1"
+	"github.com/a632079/ncm-helper/src/web/controllers/api/v1/auth"
 	"github.com/a632079/ncm-helper/src/web/middlewares"
 	"github.com/gin-contrib/requestid"
 	"github.com/gin-gonic/gin"
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 	"github.com/thinkerou/favicon"
-	"log"
 	"os"
 )
 
@@ -32,6 +33,13 @@ func InitWebServer() *gin.Engine {
 	}
 
 	r.Use(middlewares.Cors())
+
+	// setup routes
+	setupRoutes(r)
+	return r
+}
+
+func setupRoutes(r *gin.Engine) {
 	if !viper.IsSet("server.secret") {
 		log.Fatal("[web] can't start server because of the secret is not set.")
 	}
@@ -44,8 +52,12 @@ func InitWebServer() *gin.Engine {
 
 	v1 := r.Group("/api/v1")
 	{
+		// protected route
+		// protected := r.Group("/api/v1", middlewares.AuthByMasterKey())
+		// {
+		// }
+		// common routes
 		v1.GET("/ping", apiV1.Ping)
+		v1.GET("/auth/check", auth.Check)
 	}
-
-	return r
 }

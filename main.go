@@ -38,11 +38,12 @@ func init() {
 	// Init Drivers
 	prestart.Do()
 
-	// init Web Server
-	r = web.InitWebServer()
 	if config.Debug {
 		log.Info("[debug] 已启用调试模式")
 	}
+
+	// init Web Server
+	r = web.InitWebServer()
 }
 
 func main() {
