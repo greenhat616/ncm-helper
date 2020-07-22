@@ -8,7 +8,10 @@ import (
 	"strings"
 )
 
+// Util is a struct that impl a collection of utils in crypto
 type Util struct{}
+
+// IUtil is a interface abstracted from Util, intended to test by unit
 type IUtil interface {
 	GenRandomBytes(size int) (blk []byte, err error)
 	PKCS7Padding(cipherText []byte, blockSize int) []byte
@@ -62,18 +65,21 @@ func (*Util) charCodeAt(s string, n int) rune {
 	return 0
 }
 
+// GenRandomBytes is a func that generate a specific length of random bytes array
 func (*Util) GenRandomBytes(size int) (blk []byte, err error) {
 	blk = make([]byte, size)
 	_, err = rand.Read(blk)
 	return
 }
 
+// PKCS7Padding is a func that pad the byte array with specific size by PKCS7
 func (*Util) PKCS7Padding(cipherText []byte, blockSize int) []byte {
 	padding := blockSize - len(cipherText)%blockSize
 	padText := bytes.Repeat([]byte{byte(padding)}, padding)
 	return append(cipherText, padText...)
 }
 
+// PKCS7UnPadding is a func that shrink(unPad) the byte array with specific size by PKCS7
 func (*Util) PKCS7UnPadding(origData []byte) []byte {
 	length := len(origData)
 	unPadding := int(origData[length-1])
