@@ -12,6 +12,7 @@ func AuthByMasterKey() gin.HandlerFunc {
 	return func(context *gin.Context) {
 		if masterKey != "" && !util.ValidTokenByContext(context) {
 			util.Fail(context, map[string]interface{}{}, 401)
+			context.Abort()
 		} else {
 			context.Next()
 		}
