@@ -5,6 +5,7 @@ import "unicode/utf8"
 type utf8S struct {
 }
 
+// UTF8 is a var that impl the utf8s struct, a collection of tools to pad the string in UTF8
 var UTF8 = &utf8S{}
 
 func (p *utf8S) times(str string, n int) (out string) {
