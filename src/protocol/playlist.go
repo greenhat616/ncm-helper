@@ -70,3 +70,28 @@ func (p *NCM) AddSongsToPlaylist(songIDs []string, playlistID string) (err error
 	}
 	return
 }
+
+// PlaylistDetail is a func that perform a request that require the detail of the specific playlist
+func (p *NCM) PlaylistDetail(playlistID string, s int) (result NCMPlaylistDetailResponseData, err error) {
+	data := map[string]interface{}{
+		"id": playlistID,
+		"n":  100000,
+		"s":  s, // 歌单最近的 s 个收藏者
+	}
+	options := request.Options{
+		Cookies: p.Cookies,
+		Crypto:  "linuxapi",
+	}
+	resp, err := request.CreateRequest("POST", "https://music.163.com/weapi/v3/playlist/detail", data, options)
+	if err != nil {
+		return
+	}
+	if err = json.Unmarshal(resp.Data, &result); err != nil {
+		return
+	}
+	if result.Code != 200 {
+		log.Error(d)
+		err = errors.New("查询歌单细节出错")
+	}
+	return
+}
