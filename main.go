@@ -12,10 +12,14 @@ import (
 )
 
 var (
-	BuildTag    = "Unknown"
-	BuildTime   = "Unknown"
+	// BuildTag is a commit hash that will be injected in release mode
+	BuildTag = "Unknown"
+	// BuildTime is a time, when it build, that will be injected in release mode
+	BuildTime = "Unknown"
+	// MakeVersion is the version of make in release, will be injected in release mode
 	MakeVersion = "Unknown"
-	Version     = "development"
+	// Version is the version of this program, will be injected in release mode
+	Version = "development"
 )
 
 var r *gin.Engine
