@@ -8,21 +8,19 @@ import (
 	"crypto/aes"
 	"crypto/cipher"
 	"crypto/md5"
-	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/base64"
 	"encoding/hex"
 	"encoding/pem"
 	"errors"
-	"io"
 	"math/big"
 )
 
 var (
 	iv          = []byte("0102030405060708")
 	presetKey   = []byte("0CoJUm6Qyw8W8jud")
-	linuxApiKey = []byte("rFgB&h#%2?^eDg:Q")
+	linuxAPIKey = []byte("rFgB&h#%2?^eDg:Q")
 	base62      = []string{"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "1", "2", "3", "4", "5", "6", "7", "8", "9", "0"}
 	publicKey   = `-----BEGIN PUBLIC KEY-----
 MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDgtQn2JZ34ZC28NWYpAUd98iZ37BUrX/aKzmFbt7clFSs6sXqHauqKWqdtLkF2KexO40H1YTX8z2lSgBBOAxLsvaklV8k4cBFK9snQXE9/DDaFt6Rr7iVZMldczhC0JNgTz+SHXT6CBHuX3e9SdB1Ua44oncaTWz7OBGLbCiK45wIDAQAB
@@ -31,7 +29,8 @@ MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDgtQn2JZ34ZC28NWYpAUd98iZ37BUrX/aKzmFbt7cl
 )
 var util IUtil = &Util{}
 
-func AESGCMEncrypt(buffer []byte, key []byte, iv []byte) ([]byte, error) {
+/*
+func aesGCMEncrypt(buffer []byte, key []byte) ([]byte, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return nil, err
@@ -48,8 +47,9 @@ func AESGCMEncrypt(buffer []byte, key []byte, iv []byte) ([]byte, error) {
 	cipherText := c.Seal(nil, nonce, buffer, nil)
 	return cipherText, nil
 }
+*/
 
-func AESCBCEncrypt(buffer []byte, key []byte, iv []byte) ([]byte, error) {
+func aesCBCEncrypt(buffer []byte, key []byte, iv []byte) ([]byte, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return nil, err
@@ -61,7 +61,7 @@ func AESCBCEncrypt(buffer []byte, key []byte, iv []byte) ([]byte, error) {
 	return cipherText, nil
 }
 
-func AESECBEncrypt(buffer []byte, key []byte, iv []byte) ([]byte, error) {
+func aesECBEncrypt(buffer []byte, key []byte) ([]byte, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return nil, err
@@ -75,7 +75,7 @@ func AESECBEncrypt(buffer []byte, key []byte, iv []byte) ([]byte, error) {
 	return encrypted, nil
 }
 
-func RSAEncryptWithNoPadding(buffer []byte, key string) ([]byte, error) {
+func rsaEncryptWithNoPadding(buffer []byte, key string) ([]byte, error) {
 	// 解密 pem 格式的公钥
 	block, _ := pem.Decode([]byte(key))
 	if block == nil {
@@ -92,9 +92,9 @@ func RSAEncryptWithNoPadding(buffer []byte, key string) ([]byte, error) {
 	// 加密
 	c := new(big.Int).SetBytes(buffer)
 	return c.Exp(c, big.NewInt(int64(pub.E)), pub.N).Bytes(), nil
-
 }
 
+// Decrypt is a func that decrypt the eapi data (if possible)
 func Decrypt(buffer []byte) (decrypted []byte, err error) {
 	defer func() {
 		if r := recover(); r != nil {
@@ -108,16 +108,17 @@ func Decrypt(buffer []byte) (decrypted []byte, err error) {
 			}
 		}
 	}()
-	cipher, _ := aes.NewCipher([]byte(eapiKey))
+	c, _ := aes.NewCipher([]byte(eapiKey))
 	decrypted = make([]byte, len(buffer))
 	size := 16
 
 	for bs, be := 0, size; bs < len(buffer); bs, be = bs+size, be+size {
-		cipher.Decrypt(decrypted[bs:be], buffer[bs:be])
+		c.Decrypt(decrypted[bs:be], buffer[bs:be])
 	}
 	return
 }
 
+// WEAPI is a func that impl the encrypt the data of web api
 func WEAPI(data []byte) (params []byte, encSecKey []byte, err error) {
 	secretKey, err := util.GenRandomBytes(16)
 	// fmt.Printf("%v", secretKey)
@@ -128,27 +129,28 @@ func WEAPI(data []byte) (params []byte, encSecKey []byte, err error) {
 		secretKey[k] = byte(util.charCodeAt(util.base62Encode(int(v)), 0))
 	}
 	// fmt.Printf("%v", secretKey)
-	presetData, err := AESCBCEncrypt(data, presetKey, iv)
+	presetData, err := aesCBCEncrypt(data, presetKey, iv)
 	if err != nil {
 		return
 	}
 	// fmt.Printf("%v", presetData)
 	presetDataBase64 := make([]byte, base64.StdEncoding.EncodedLen(len(presetData)))
 	base64.StdEncoding.Encode(presetDataBase64, presetData)
-	secretData, err := AESCBCEncrypt(presetDataBase64, secretKey, iv)
+	secretData, err := aesCBCEncrypt(presetDataBase64, secretKey, iv)
 	if err != nil {
 		return
 	}
 	params = make([]byte, base64.StdEncoding.EncodedLen(len(secretData)))
 	base64.StdEncoding.Encode(params, secretData)
-	encSecKeyBytes, err := RSAEncryptWithNoPadding(util.reverse(secretKey), publicKey)
+	encSecKeyBytes, err := rsaEncryptWithNoPadding(util.reverse(secretKey), publicKey)
 	encSecKey = make([]byte, hex.EncodedLen(len(encSecKeyBytes)))
 	hex.Encode(encSecKey, encSecKeyBytes)
 	return
 }
 
+// LinuxAPI is a func that encrypt data of linux api
 func LinuxAPI(data []byte) (eParams []byte, err error) {
-	encrypted, err := AESECBEncrypt(data, linuxApiKey, nil)
+	encrypted, err := aesECBEncrypt(data, linuxAPIKey)
 	if err != nil {
 		return
 	}
@@ -158,13 +160,14 @@ func LinuxAPI(data []byte) (eParams []byte, err error) {
 	return
 }
 
+// EAPI is a func that encrypt data from Android api
 func EAPI(url string, data []byte) (params []byte, err error) {
 	msg := "nobody" + url + "use" + string(data) + "md5forencrypt"
 	h := md5.New()
 	h.Write([]byte(msg))
 	digest := hex.EncodeToString(h.Sum(nil))
 	target := url + "-36cd479b6b5-" + string(data) + "-36cd479b6b5-" + digest
-	encrypted, err := AESECBEncrypt([]byte(target), []byte(eapiKey), nil)
+	encrypted, err := aesECBEncrypt([]byte(target), []byte(eapiKey))
 	if err != nil {
 		return
 	}

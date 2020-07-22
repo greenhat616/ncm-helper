@@ -36,7 +36,7 @@ func TestWEAPI(t *testing.T) {
 		202,
 	}, nil).AnyTimes()
 	util = m
-	assert := assert.New(t)
+	a := assert.New(t)
 	// have a try
 	if b, _ := util.GenRandomBytes(16); len(b) != 16 {
 		t.Error("can't generate specific length of bytes.")
@@ -51,8 +51,8 @@ func TestWEAPI(t *testing.T) {
 	} else {
 		t.Logf("params: %s", params)
 		t.Logf("enSecKey: %s", enSecKey)
-		assert.Equal("0PzH++wpg/l5lIb2L9gmeQ7QiQTfrjCSorIF/LCeY0ZIeAGjRQPF8eTV53gxTM6e", string(params), "params should be the same")
-		assert.Equal("0cc0bf7500f05eb4c5a5979ce2a82e722c786c04945a692977cfc1c9c8e0297836ba06fa9acbc357d82b01049e5f683a718037728331d5de4d1b85c258619efb9dfbeaa4ec30ee1f6ce0eed8e5933286120ed25b08da93d5f651512ad45f57d115f6d024137a7bc52ddaa0f347f51c7d6a19a23ab574037443c9829aee32a434", string(enSecKey), "enSecKey should be the same")
+		a.Equal("0PzH++wpg/l5lIb2L9gmeQ7QiQTfrjCSorIF/LCeY0ZIeAGjRQPF8eTV53gxTM6e", string(params), "params should be the same")
+		a.Equal("0cc0bf7500f05eb4c5a5979ce2a82e722c786c04945a692977cfc1c9c8e0297836ba06fa9acbc357d82b01049e5f683a718037728331d5de4d1b85c258619efb9dfbeaa4ec30ee1f6ce0eed8e5933286120ed25b08da93d5f651512ad45f57d115f6d024137a7bc52ddaa0f347f51c7d6a19a23ab574037443c9829aee32a434", string(enSecKey), "enSecKey should be the same")
 	}
 }
 
@@ -64,8 +64,8 @@ func TestLinuxAPI(t *testing.T) {
 		return
 	}
 	t.Logf("eparams: %s", eParams)
-	assert := assert.New(t)
-	assert.Equal("6270E70FBBC25054048A37935D9EAAC6", string(eParams), "eParams must be the same")
+	a := assert.New(t)
+	a.Equal("6270E70FBBC25054048A37935D9EAAC6", string(eParams), "eParams must be the same")
 }
 
 // TODO: Test Decrypt func, not found a valid test data source.
@@ -78,6 +78,6 @@ func TestEAPI(t *testing.T) {
 		return
 	}
 	t.Logf("params: %s", params)
-	assert := assert.New(t)
-	assert.Equal("AF047AB9ACC436C08101E8542E2D2378AB110DB4C7B0F4BC32B33E80214D1C932042444B7488CCCD560ED501F1C1E0D45431D9540836813A074FCC4F407C8541B072375589492FA0A18D43B82350430D211D5D5093DA6E1E5528ABADF7FBB357", string(params), "params must be the same")
+	a := assert.New(t)
+	a.Equal("AF047AB9ACC436C08101E8542E2D2378AB110DB4C7B0F4BC32B33E80214D1C932042444B7488CCCD560ED501F1C1E0D45431D9540836813A074FCC4F407C8541B072375589492FA0A18D43B82350430D211D5D5093DA6E1E5528ABADF7FBB357", string(params), "params must be the same")
 }
