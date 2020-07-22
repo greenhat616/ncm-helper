@@ -44,6 +44,7 @@ func chooseUserAgent(ua string) string {
 	return userAgentList[index]
 }
 
+// Options is a struct as a param of Request generator
 type Options struct {
 	Cookies []*http.Cookie
 	UA      string
@@ -52,12 +53,14 @@ type Options struct {
 	URL     string // eapi is needed
 }
 
+// APIResponse is a response struct that store responded data in need
 type APIResponse struct {
 	StatusCode int
 	Cookies    []*http.Cookie
 	Data       []byte
 }
 
+// CreateWEAPIRequest is a request generator of web api
 func CreateWEAPIRequest(method string, url string, data map[string]interface{}, options Options) (response *APIResponse, err error) {
 	headers, url := preFillHeader(method, url, options)
 	// set CSRF Token
@@ -88,6 +91,7 @@ func CreateWEAPIRequest(method string, url string, data map[string]interface{}, 
 	return handleResponse(resp)
 }
 
+// CreateEAPIRequest is a request generator of Android api
 func CreateEAPIRequest(method string, url string, data map[string]interface{}, options Options) (response *APIResponse, err error) {
 	// check options
 	if options.URL == "" {
@@ -121,7 +125,7 @@ func CreateEAPIRequest(method string, url string, data map[string]interface{}, o
 	headers = setDefaultValue(headers, "buildver", string(time.Now().Unix()))
 	headers = setDefaultValue(headers, "resolution", "1920x1080")
 	headers = setDefaultValue(headers, "os", "android")
-	headers["requestId"] = genRequestId()
+	headers["requestId"] = genRequestID()
 
 	// encrypted data
 	data["headers"] = headers
@@ -159,7 +163,8 @@ func CreateEAPIRequest(method string, url string, data map[string]interface{}, o
 	return
 }
 
-func CreateLinuxApiRequest(method string, url string, data map[string]interface{}, options Options) (response *APIResponse, err error) {
+// CreateLinuxAPIRequest is a request generator of linux api.
+func CreateLinuxAPIRequest(method string, url string, data map[string]interface{}, options Options) (response *APIResponse, err error) {
 	headers, url := preFillHeader(method, url, options)
 	raw := map[string]interface{}{
 		"method": method,
@@ -191,12 +196,14 @@ func CreateLinuxApiRequest(method string, url string, data map[string]interface{
 	return handleResponse(resp)
 }
 
+// CreateRequest is a request generator combined with web, linux, android api
+// usage is similar with the nodejs impl.
 func CreateRequest(method string, url string, data map[string]interface{}, options Options) (response *APIResponse, err error) {
 	switch options.Crypto {
 	case "weapi":
 		return CreateRequest(method, url, data, options)
 	case "linuxapi":
-		return CreateLinuxApiRequest(method, url, data, options)
+		return CreateLinuxAPIRequest(method, url, data, options)
 	case "eapi":
 		return CreateEAPIRequest(method, url, data, options)
 	default:

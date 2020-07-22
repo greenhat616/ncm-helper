@@ -33,7 +33,7 @@ func handleResponse(resp *resty.Response) (response *APIResponse, err error) {
 		Data:       resp.Body(),
 	}
 	if resp.StatusCode() != 200 {
-		err = errors.New(fmt.Sprintf("request failed, status code: "+strconv.Itoa(resp.StatusCode())+", data: %s", resp.Request.Body))
+		err = fmt.Errorf("request failed, status code: "+strconv.Itoa(resp.StatusCode())+", data: %s", resp.Request.Body)
 		return
 	}
 	return
@@ -72,7 +72,7 @@ func setDefaultValue(headers map[string]string, name string, value string) map[s
 	return headers
 }
 
-func genRequestId() string {
+func genRequestID() string {
 	ms := time.Now().UnixNano() / 1e6
 	rand.Seed(time.Now().Unix())
 	r := strconv.Itoa(rand.Intn(1000))
