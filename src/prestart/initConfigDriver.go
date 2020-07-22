@@ -1,4 +1,4 @@
-package preStart
+package prestart
 
 import (
 	"bytes"
@@ -23,11 +23,11 @@ func initConfigDriver() {
 	if config.File != "" {
 		content, err := ioutil.ReadFile(config.File)
 		if err != nil {
-			log.Fatalf("[preStart] can't read specific config file, path: %s \nerror detail: %s\n", config.File, err)
+			log.Fatalf("[prestart] can't read specific config file, path: %s \nerror detail: %s\n", config.File, err)
 		}
 		err = viper.ReadConfig(bytes.NewBuffer(content))
 		if err != nil {
-			log.Fatalf("[preStart] can't load specific config file, path: %s \nerror detail: %s\n", config.File, err)
+			log.Fatalf("[prestart] can't load specific config file, path: %s \nerror detail: %s\n", config.File, err)
 		}
 	} else {
 		// Parse path etc > home > localPath
@@ -37,7 +37,7 @@ func initConfigDriver() {
 		viper.AddConfigPath("../conf")
 		err := viper.ReadInConfig()
 		if err != nil {
-			log.Fatalf("[preStart] Fatal error while reading config file: %s \n", err)
+			log.Fatalf("[prestart] Fatal error while reading config file: %s \n", err)
 		}
 	}
 }

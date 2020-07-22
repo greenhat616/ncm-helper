@@ -3,7 +3,7 @@ package main
 import (
 	"github.com/a632079/ncm-helper/src/commander"
 	"github.com/a632079/ncm-helper/src/config"
-	"github.com/a632079/ncm-helper/src/preStart"
+	"github.com/a632079/ncm-helper/src/prestart"
 	"github.com/a632079/ncm-helper/src/web"
 	"github.com/gin-gonic/gin"
 	log "github.com/sirupsen/logrus"
@@ -32,7 +32,7 @@ func init() {
 	commander.Parse()
 
 	// Init Drivers
-	preStart.Do()
+	prestart.Do()
 
 	// init Web Server
 	r = web.InitWebServer()

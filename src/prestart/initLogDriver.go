@@ -1,4 +1,4 @@
-package preStart
+package prestart
 
 import (
 	"github.com/a632079/ncm-helper/src/config"
