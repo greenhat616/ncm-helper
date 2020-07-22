@@ -61,7 +61,7 @@ func (p *NCM) AddSongsToPlaylist(songIDs []string, playlistID string) (err error
 		return
 	}
 	var d map[string]interface{}
-	if err := json.Unmarshal(resp.Data, &d); err != nil {
+	if err = json.Unmarshal(resp.Data, &d); err != nil {
 		return
 	}
 	if code := d["code"].(int); code != 200 {
