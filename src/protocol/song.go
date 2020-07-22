@@ -10,6 +10,7 @@ import (
 	"strings"
 )
 
+// SongDetail is a func that impl that get details of songs from netease cloud music
 func (p *NCM) SongDetail(songIds []string) (result NeteaseSongDetailResponseData, err error) {
 	if !p.isLogin {
 		err = errors.New("未登录")
@@ -46,7 +47,8 @@ func (p *NCM) SongDetail(songIds []string) (result NeteaseSongDetailResponseData
 	return
 }
 
-// br default is 999000
+// SongURL is a func that get URLs of songs from netease cloud music,
+// NOTICE: br is 999000 by default
 func (p *NCM) SongURL(songIds []string, br int) (result NeteaseSongURLResponseData, err error) {
 	cookies := p.Cookies
 	n := true

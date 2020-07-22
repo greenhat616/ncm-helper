@@ -11,8 +11,21 @@ import (
 	"regexp"
 )
 
-func Login() {
-
+// Login is a func that impl email, phone and cookies login
+func (p *NCM) Login() (err error) {
+	if p.Phone != "" && p.Pass != "" {
+		if p.CountryCode == "" {
+			p.CountryCode = "86"
+		}
+		err = p.phoneLogin(p.Phone, p.CountryCode, p.Pass, p.IsMD5Pass)
+	} else if p.Email != "" && p.Pass != "" {
+		err = p.emailLogin(p.Email, p.Pass, p.IsMD5Pass)
+	} else if p.Cookies != nil {
+		err = p.CheckLogin()
+	} else {
+		err = errors.New("mismatch login type")
+	}
+	return
 }
 
 func (p *NCM) phoneLogin(phone string, countyCode string, password string, isMD5Password bool) (err error) {
@@ -85,8 +98,9 @@ func (p *NCM) emailLogin(email string, password string, isMD5Password bool) (err
 	return
 }
 
+// CheckLogin is a func that check cookies whether is valid
 // TODO: need further test
-func (p *NCM) CheckLogin(cookies []*http.Cookie) (err error) {
+func (p *NCM) CheckLogin() (err error) {
 	resp, err := resty.New().
 		SetHeaders(map[string]string{
 			"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36",
@@ -98,16 +112,17 @@ func (p *NCM) CheckLogin(cookies []*http.Cookie) (err error) {
 		return
 	}
 	if resp.StatusCode() != 200 {
-		err = errors.New(fmt.Sprintf("status code is not equal 200, actually the code is  %s", err))
+		err = fmt.Errorf("status code is not equal 200, actually the code is  %s", err)
 		return
 	}
+
 	// get detail
 	re1 := regexp.MustCompile("GUser\\s*=\\s*([^;]+);")
 	re2 := regexp.MustCompile("GBinds\\s*=\\s*([^;]+);")
 	len1 := len(re1.FindAllString(resp.String(), -1))
 	len2 := len(re2.FindAllString(resp.String(), -1))
 	if len1 < 2 || len2 < 2 {
-		err = errors.New("can't match data, might don't login.")
+		err = errors.New("can't match data, might don't login")
 	} else {
 		p.isLogin = true
 	}

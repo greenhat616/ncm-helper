@@ -6,7 +6,8 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func (p *NCM) Scrobble(songId string, sourceId string, time string) (err error) {
+// Scrobble is a func that impl the feature, called “听歌打卡” in Chinese
+func (p *NCM) Scrobble(songID string, sourceID string, time string) (err error) {
 	if !p.isLogin {
 		err = errors.New("未登录")
 		return
@@ -14,12 +15,13 @@ func (p *NCM) Scrobble(songId string, sourceId string, time string) (err error) 
 	data := map[string]interface{}{
 		"download": 0,
 		"end":      "playend",
-		"id":       songId,
-		"sourceId": sourceId,
+		"id":       songID,
+		"sourceId": sourceID,
 		"time":     time,
 		"type":     "song",
 		"wifi":     0,
 	}
+
 	options := request.Options{
 		Cookies: p.Cookies,
 		Crypto:  "weapi",

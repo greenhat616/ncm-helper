@@ -1,11 +1,12 @@
 package protocol
 
 import (
-	"errors"
 	"github.com/a632079/ncm-helper/src/protocol/request"
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )
 
+// SignIn is a func impl the feature, called “签到” in Chinese
 func (p *NCM) SignIn(t int) (err error) {
 	if !p.isLogin {
 		err = errors.New("未登录")

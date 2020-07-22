@@ -1,5 +1,6 @@
 package protocol
 
+// NeteaseSongDetailResponseData is a response struct of NCM API: song detail
 type NeteaseSongDetailResponseData struct {
 	Songs []struct {
 		Name string `json:"name"`
@@ -94,6 +95,7 @@ type NeteaseSongDetailResponseData struct {
 	Code int `json:"code"`
 }
 
+// NeteaseSongURLResponseData is a response struct of NCM API: song URLS
 type NeteaseSongURLResponseData struct {
 	Data []struct {
 		ID            int         `json:"id"`
