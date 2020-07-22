@@ -7,6 +7,7 @@ import (
 	"os"
 )
 
+// V is a flag mapping, intended to show version text if be true
 var V bool
 
 func registerVersionFlag() {
