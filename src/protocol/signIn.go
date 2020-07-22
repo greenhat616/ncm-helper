@@ -19,36 +19,26 @@ func (p *NCM) SignIn(t int) (err error) {
 		Cookies: p.Cookies,
 		Crypto:  "weapi",
 	}
-	if p.IP != "" {
-		options.IP = p.IP
-	}
+	options = appendCustomClientIP(options, p.IP)
 	resp, err := request.CreateRequest("POST", "https://music.163.com/weapi/point/dailyTask", data, options)
 	if err != nil {
 		return
 	}
 	// parse result
-	result := make(map[string]interface{})
+	var result map[string]interface{}
 	err = json.Unmarshal(resp.Data, &result)
 	if err != nil {
 		return
 	}
-	c, ok := result["code"]
-	if !ok {
-		log.Error(resp)
-		err = errors.New("code is not exist")
-		return
-	}
-	code, ok := c.(int)
-	if !ok {
-		log.Error(resp)
-		err = errors.New("can't parse code")
-		return
-	}
+	code := result["code"].(int)
 	switch code {
 	case -2:
 		err = errors.New("重复签到")
 	case 301:
 		err = errors.New("未登录")
+	default:
+		log.Error(result)
+		err = errors.New("未知错误")
 	}
 	return
 }

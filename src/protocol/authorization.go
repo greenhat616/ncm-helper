@@ -45,9 +45,7 @@ func (p *NCM) phoneLogin(phone string, countyCode string, password string, isMD5
 		UA:      "pc",
 		Crypto:  "weapi",
 	}
-	if p.IP != "" {
-		options.IP = p.IP
-	}
+	options = appendCustomClientIP(options, p.IP)
 	resp, err := request.CreateRequest(
 		"POST",
 		"https://music.163.com/weapi/login/cellphone",
@@ -83,9 +81,7 @@ func (p *NCM) emailLogin(email string, password string, isMD5Password bool) (err
 		UA:      "pc",
 		Crypto:  "weapi",
 	}
-	if p.IP != "" {
-		options.IP = p.IP
-	}
+	options = appendCustomClientIP(options, p.IP)
 	resp, err := request.CreateRequest("POST", "https://music.163.com/weapi/login", data, options)
 	if err != nil {
 		if resp.StatusCode == 502 { // password or username err
@@ -115,7 +111,6 @@ func (p *NCM) CheckLogin() (err error) {
 		err = fmt.Errorf("status code is not equal 200, actually the code is  %s", err)
 		return
 	}
-
 	// get detail
 	re1 := regexp.MustCompile("GUser\\s*=\\s*([^;]+);")
 	re2 := regexp.MustCompile("GBinds\\s*=\\s*([^;]+);")

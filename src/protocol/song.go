@@ -13,7 +13,7 @@ import (
 // SongDetail is a func that impl that get details of songs from netease cloud music
 func (p *NCM) SongDetail(songIds []string) (result NeteaseSongDetailResponseData, err error) {
 	if !p.isLogin {
-		err = errors.New("未登录")
+		err = notLoginError()
 		return
 	}
 	var buffer []string
@@ -28,9 +28,7 @@ func (p *NCM) SongDetail(songIds []string) (result NeteaseSongDetailResponseData
 		Cookies: p.Cookies,
 		Crypto:  "weapi",
 	}
-	if p.IP != "" {
-		options.IP = p.IP
-	}
+	options = appendCustomClientIP(options, p.IP)
 	resp, err := request.CreateRequest("POST", "https://music.163.com/weapi/v3/song/detail", data, options)
 	if err != nil {
 		return
@@ -78,15 +76,12 @@ func (p *NCM) SongURL(songIds []string, br int) (result NeteaseSongURLResponseDa
 		UA:      "pc",
 		Crypto:  "linuxapi",
 	}
-	if p.IP != "" {
-		options.IP = p.IP
-	}
+	options = appendCustomClientIP(options, p.IP)
 	resp, err := request.CreateRequest("POST", "https://music.163.com/api/song/enhance/player/url", data, options)
 	if err != nil {
 		return
 	}
-	err = json.Unmarshal(resp.Data, &result)
-	if err != nil {
+	if err = json.Unmarshal(resp.Data, &result); err != nil {
 		return
 	}
 	if result.Code != 200 || len(result.Data) == 0 {
