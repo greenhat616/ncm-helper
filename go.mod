@@ -5,7 +5,7 @@ go 1.14
 require (
 	github.com/fsnotify/fsnotify v1.4.9 // indirect
 	github.com/gin-contrib/cors v1.3.1
-	github.com/gin-contrib/requestid v0.0.0-20200512155051-855d6508f0f0
+	github.com/gin-contrib/requestid v0.0.1
 	github.com/gin-contrib/sessions v0.0.3
 	github.com/gin-gonic/gin v1.6.3
 	github.com/go-bindata/go-bindata v3.1.2+incompatible // indirect
@@ -19,7 +19,7 @@ require (
 	github.com/mattn/go-runewidth v0.0.9 // indirect
 	github.com/mgechev/revive v1.0.2 // indirect
 	github.com/mitchellh/mapstructure v1.3.2 // indirect
-	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
+	github.com/patrickmn/go-cache v2.1.0+incompatible
 	github.com/pelletier/go-toml v1.8.0 // indirect
 	github.com/pkg/errors v0.9.1
 	github.com/sirupsen/logrus v1.6.0
