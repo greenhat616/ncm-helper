@@ -14,7 +14,7 @@
     "@commitlint/prompt": "8.3.5",
     "@commitlint/prompt-cli": "8.3.5",
     "commitizen": "4.2.1",
-    "cz-conventional-changelog": "3.2.0",
+    "cz-conventional-changelog": "3.3.0",
     "husky": "4.2.5",
     "lint-staged": "10.2.11"
   },
